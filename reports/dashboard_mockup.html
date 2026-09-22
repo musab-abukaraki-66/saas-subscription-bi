@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SaaS Subscription BI — Dashboard</title>
+<style>
+  :root {
+    --purple: #7c3aed;
+    --purple-dark: #4c1d95;
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    color: var(--text);
+    padding: 28px 36px 40px;
+    width: 1400px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  h1 { font-size: 22px; margin: 0; }
+  .subtitle { color: var(--muted); font-size: 13px; }
+  .badge {
+    background: var(--purple);
+    color: white;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+  }
+  .kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 20px 0 22px;
+  }
+  .kpi {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-left: 4px solid var(--purple);
+  }
+  .kpi .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .kpi .value { font-size: 26px; font-weight: 700; margin-top: 4px; color: var(--purple-dark); }
+  .kpi .sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 16px;
+  }
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+  .panel {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 14px 16px 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .panel img { width: 100%; display: block; border-radius: 6px; }
+  .panel-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  footer {
+    margin-top: 22px;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SaaS Subscription BI — Growth & Retention</h1>
+      <div class="subtitle">Portfolio case study &middot; synthetic dataset &middot; 2023&ndash;2024</div>
+    </div>
+    <span class="badge">DASHBOARD MOCKUP — Python/HTML render, not a Power BI Desktop screenshot</span>
+  </header>
+
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="label">Total MRR (Dec 2024)</div>
+      <div class="value">$129.4K</div>
+      <div class="sub">1,501 active customers</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Avg. Monthly Logo Churn</div>
+      <div class="value">4.50%</div>
+      <div class="sub">Trending down since Q2 2023</div>
+    </div>
+    <div class="kpi">
+      <div class="label">Blended ARPU</div>
+      <div class="value">$86.21</div>
+      <div class="sub">Across all plans, latest month</div>
+    </div>
+    <div class="kpi">
+      <div class="label">12-Month Cohort Retention</div>
+      <div class="value">60.1%</div>
+      <div class="sub">Averaged across all signup cohorts</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <div class="panel-title">New vs. Churned MRR, with Total MRR trend</div>
+      <img src="figures/01_mrr_trend.png" alt="MRR trend">
+    </div>
+    <div class="panel">
+      <div class="panel-title">Monthly Logo Churn Rate</div>
+      <img src="figures/02_churn_rate.png" alt="Churn rate">
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="panel">
+      <div class="panel-title">Cohort Retention Curve</div>
+      <img src="figures/03_cohort_retention.png" alt="Cohort retention">
+    </div>
+    <div class="panel">
+      <div class="panel-title">MRR by Segment, split by Plan</div>
+      <img src="figures/04_arpu_by_segment.png" alt="ARPU by segment">
+    </div>
+  </div>
+
+  <footer>
+    All KPI values verified against sql/*.sql output via src/run_sql.py &middot; synthetic data, seed=7 &middot; not a real company's metrics
+  </footer>
+</body>
+</html>

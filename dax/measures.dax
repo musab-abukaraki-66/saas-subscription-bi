@@ -1,0 +1,93 @@
+// ============================================================================
+// DAX measures for the SaaS Subscription BI model.
+//
+// IMPORTANT — how these were verified:
+// Power BI Desktop was not available in the environment this project was
+// built in. These measures are written for Power BI's DAX engine against
+// the exact star schema in docs/data_model.md (fact_subscription_monthly +
+// dim_customer / dim_plan / dim_date, with the standard one-to-many
+// relationships from each dimension into the fact table).
+//
+// Each measure's LOGIC was independently verified by writing and EXECUTING
+// the equivalent query in sql/ against the same data (see src/run_sql.py for
+// real, run output). The DAX below is the Power BI-native expression of that
+// already-verified logic, not an untested guess — but it has not itself been
+// executed inside Power BI. If you load model/ into Power BI Desktop, these
+// measures should reproduce the numbers in reports/figures/ and README.md.
+// ============================================================================
+
+// --- Core measures ---------------------------------------------------------
+
+Total MRR =
+SUM ( fact_subscription_monthly[mrr] )
+// Verified against: sql/01_mrr_trend.sql -> total_mrr
+
+New MRR =
+CALCULATE (
+    [Total MRR],
+    fact_subscription_monthly[event_type] = "new"
+)
+// Verified against: sql/01_mrr_trend.sql -> new_mrr
+
+Churned MRR =
+CALCULATE (
+    [Total MRR],
+    fact_subscription_monthly[event_type] = "churned"
+)
+// Verified against: sql/01_mrr_trend.sql -> churned_mrr
+
+Net New MRR =
+[New MRR] - [Churned MRR]
+
+Active Customers =
+DISTINCTCOUNT ( fact_subscription_monthly[customer_id] )
+// Verified against: sql/01_mrr_trend.sql -> active_customers
+
+// --- Churn ------------------------------------------------------------------
+
+Starting Customers (Prev Month) =
+CALCULATE (
+    [Active Customers],
+    DATEADD ( dim_date[month], -1, MONTH )
+)
+
+Churned Customers =
+CALCULATE (
+    DISTINCTCOUNT ( fact_subscription_monthly[customer_id] ),
+    fact_subscription_monthly[event_type] = "churned"
+)
+
+Logo Churn Rate % =
+DIVIDE ( [Churned Customers], [Starting Customers (Prev Month)] )
+// Verified against: sql/02_monthly_churn_rate.sql -> churn_rate_pct
+// (SQL computes the previous-month base with a calendar-string join since
+// SQLite has no DATEADD; DAX gets this for free via the date table + DATEADD.)
+
+// --- Revenue per account -----------------------------------------------------
+
+ARPU =
+DIVIDE ( [Total MRR], [Active Customers] )
+// Verified against: sql/03_arpu_by_segment_plan.sql -> arpu, sliced by
+// dim_customer[segment] and dim_plan[plan_name] in the report visual.
+
+// --- Retention / cohorts ------------------------------------------------------
+
+// Cohort retention is computed in SQL (sql/04_cohort_retention.sql) rather
+// than as a single DAX measure, because it requires a per-cohort denominator
+// (cohort size at signup) that is naturally expressed as a query, not a
+// measure over the live filter context. In Power BI this would be modeled as
+// a calculated table (dim_cohort_retention) built from a near-identical M/DAX
+// query, then visualized directly — documented here rather than restated as
+// a measure to avoid presenting a re-derivation as independently verified.
+
+// --- Revenue-to-date proxy (LTV proxy) ---------------------------------------
+
+Revenue To Date Per Customer =
+DIVIDE (
+    CALCULATE ( [Total MRR], ALL ( dim_date ) ),
+    CALCULATE ( [Active Customers], ALL ( dim_date ) )
+)
+// Verified against: sql/05_channel_ltv_proxy.sql -> revenue_to_date_per_customer
+// Note: this is a simple realized-revenue-to-date average, not a predictive
+// LTV model (no discount rate, no survival-curve projection). Labeled as a
+// "proxy" throughout for that reason — see README Limitations.
