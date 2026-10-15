@@ -11,6 +11,8 @@ Usage:
 
 from __future__ import annotations
 
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -124,6 +126,7 @@ def _signup_weights(n: int) -> np.ndarray:
 
 def main() -> None:
     dim_customer, dim_plan, fact_subscription = generate()
+    os.makedirs("data", exist_ok=True)  # data/ is git-ignored, so a fresh clone lacks it
     dim_customer.to_csv("data/dim_customer.csv", index=False)
     dim_plan.to_csv("data/dim_plan.csv", index=False)
     fact_subscription.to_csv("data/fact_subscription_monthly.csv", index=False)
